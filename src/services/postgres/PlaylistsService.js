@@ -103,11 +103,11 @@ class PlaylistsService {
 
     const querySongs = {
       text: `
-      SELECT songs.id, songs.title, songs.performer 
-      FROM playlists
-      JOIN playlistsongs ON  playlistsongs.playlist_id = playlists.id
-      JOIN songs ON songs.id = playlistsongs.song_id
-      WHERE playlists.id = $1
+        SELECT songs.id, songs.title, songs.performer 
+        FROM playlists
+        JOIN playlistsongs ON  playlistsongs.playlist_id = playlists.id
+        JOIN songs ON songs.id = playlistsongs.song_id
+        WHERE playlists.id = $1
       `,
       values: [playlistId],
     };
