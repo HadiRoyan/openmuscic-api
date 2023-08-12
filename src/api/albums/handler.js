@@ -206,7 +206,7 @@ class AlbumsHandler {
     try {
       const { id: albumId } = request.params;
 
-      const likes = await this._service.getAlbumLikeById(albumId);
+      const { likes, isCached } = await this._service.getAlbumLikeById(albumId);
 
       const response = h.response({
         status: 'success',
@@ -214,6 +214,11 @@ class AlbumsHandler {
           likes,
         },
       });
+      if (isCached) {
+        response.header('X-Data-Source', 'cache');
+      } else {
+        response.header('X-Data-Source', 'server');
+      }
       return response;
     } catch (error) {
       if (error instanceof ClientError) {
