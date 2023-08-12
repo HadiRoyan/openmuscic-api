@@ -129,7 +129,7 @@ class PlaylistsService {
     };
 
     const result = await this._pool.query(query);
-    console.log(result.rows.length);
+    // console.log(result.rows.length);
 
     if (!result.rows.length) {
       throw new InvariantError('Song gagal dihapus');
