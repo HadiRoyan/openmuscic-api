@@ -2,6 +2,7 @@ const { nanoid } = require('nanoid');
 const { Pool } = require('pg');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
+const ClientError = require('../../exceptions/ClientError');
 
 class AlbumsService {
   constructor() {
@@ -78,6 +79,63 @@ class AlbumsService {
     if (!result.rows.length) {
       throw new NotFoundError('Gagal memperbarui cover. album tidak ditemukan');
     }
+  }
+
+  // user album likes
+  async addAlbumLike(userId, albumId) {
+    const isAlbumLiked = await this.checkAlbumLike(userId, albumId);
+
+    if (!isAlbumLiked) {
+      const id = `like-${nanoid(16)}`;
+      const query = {
+        text: 'INSERT INTO user_album_likes VALUES($1, $2, $3) RETURNING id',
+        values: [id, userId, albumId],
+      };
+
+      const result = await this._pool.query(query);
+      if (!result.rows[0].id) {
+        throw new InvariantError('Gagal menyukai album');
+      }
+    } else {
+      throw new ClientError('Tidak dapat menyukai album');
+    }
+  }
+
+  async deleteAlbumLike(userId, albumId) {
+    const album = await this.getAlbumById(albumId);
+
+    const query = {
+      text: 'DELETE FROM user_album_likes WHERE user_id = $1 AND album_id = $2 RETURNING id',
+      values: [userId, album.id],
+    };
+
+    const result = await this._pool.query(query);
+    if (!result.rows.length) {
+      throw new InvariantError('Gagal batal menyukai album');
+    }
+  }
+
+  async getAlbumLikeById(albumId) {
+    const query = {
+      text: 'SELECT user_id FROM user_album_likes WHERE album_id = $1',
+      values: [albumId],
+    };
+    const result = await this._pool.query(query);
+
+    return result.rowCount;
+  }
+
+  async checkAlbumLike(userId, albumId) {
+    await this.getAlbumById(albumId);
+
+    const query = {
+      text: 'SELECT * FROM user_album_likes WHERE user_id = $1 AND album_id = $2',
+      values: [userId, albumId],
+    };
+
+    const result = await this._pool.query(query);
+
+    return result.rows.length;
   }
 }
 
