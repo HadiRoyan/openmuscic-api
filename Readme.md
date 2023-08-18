@@ -1,6 +1,6 @@
 # Open Music Api App
 
-This Porgam is a submission for Dicoding course 'Learn the Basics of Back-End Applications'.  
+This program is a submission for Dicoding course 'Learn the Basics of Back-End Applications'.  
 Source code for consumer message broker program (RabbitMQ): [openmusic-app-queue-consumer](https://github.com/HadiRoyan/openmusic-app-queue-consumer)
 
 ## Installation
